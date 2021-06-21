@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from scipy import signal
 from statsmodels.tsa.seasonal import seasonal_decompose
 from statsmodels.tsa.stattools import adfuller, kpss
+from pandas.plotting import autocorrelation_plot
 
 df = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/a10.csv', parse_dates=['date'], index_col='date')
 print(df.head())
@@ -60,5 +61,8 @@ deseasonalized = df.value.values / result_mul.seasonal
 plt.figure()
 plt.plot(deseasonalized)
 plt.title('Drug Sales Deseasonalized', fontsize=16)
-plt.plot()
+
+plt.rcParams.update({'figure.figsize':(9,5), 'figure.dpi':120})
+autocorrelation_plot(df.value.tolist())
+
 plt.show()
