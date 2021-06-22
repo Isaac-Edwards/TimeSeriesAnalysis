@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 from scipy import signal
 from statsmodels.tsa.seasonal import seasonal_decompose
@@ -66,3 +67,18 @@ plt.rcParams.update({'figure.figsize':(9,5), 'figure.dpi':120})
 autocorrelation_plot(df.value.tolist())
 
 plt.show()
+
+def SampEn(U, m, r):
+    """Compute Sample entropy"""
+    def _maxdist(x_i, x_j):
+        return max([abs(ua - va) for ua, va in zip(x_i, x_j)])
+
+    def _phi(m):
+        x = [[U[j] for j in range(i, i + m - 1 + 1)] for i in range(N - m + 1)]
+        C = [len([1 for j in range(len(x)) if i != j and _maxdist(x[i], x[j]) <= r]) for i in range(len(x))]
+        return sum(C)
+
+    N = len(U)
+    return -np.log(_phi(m+1) / _phi(m))
+
+print(SampEn(df.value, m=2, r=0.2*np.std(df.value)))
