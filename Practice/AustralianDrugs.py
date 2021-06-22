@@ -3,8 +3,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import signal
 from statsmodels.tsa.seasonal import seasonal_decompose
+from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 from statsmodels.tsa.stattools import adfuller, kpss
 from pandas.plotting import autocorrelation_plot
+from pmdarima.arima.utils import ndiffs
 
 df = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/a10.csv', parse_dates=['date'], index_col='date')
 print(df.head())
@@ -82,3 +84,27 @@ def SampEn(U, m, r):
     return -np.log(_phi(m+1) / _phi(m))
 
 print(SampEn(df.value, m=2, r=0.2*np.std(df.value)))
+
+fig, axes = plt.subplots(3, 2, sharex=True)
+axes[0, 0].plot(df.value); axes[0, 0].set_title('Original Series')
+plot_acf(df.value, ax=axes[0, 1])
+
+# 1st Differencing
+axes[1, 0].plot(df.value.diff()); axes[1, 0].set_title('1st Order Differencing')
+plot_acf(df.value.diff().dropna(), ax=axes[1, 1])
+
+# 2nd Differencing
+axes[2, 0].plot(df.value.diff().diff()); axes[2, 0].set_title('2nd Order Differencing')
+plot_acf(df.value.diff().diff().dropna(), ax=axes[2, 1])
+
+plt.show()
+
+y = df.value
+## Adf Test
+print("ADF: ",  ndiffs(y, test='adf'))
+
+# KPSS test
+print("KPSS: ",  ndiffs(y, test='kpss'))
+
+# PP test:
+print("PP: ",  ndiffs(y, test='pp'))
