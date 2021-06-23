@@ -108,3 +108,13 @@ print("KPSS: ",  ndiffs(y, test='kpss'))
 
 # PP test:
 print("PP: ",  ndiffs(y, test='pp'))
+
+# PACF plot of 1st differenced series
+plt.rcParams.update({'figure.figsize':(9,3), 'figure.dpi':120})
+
+fig, axes = plt.subplots(1, 2, sharex=True)
+axes[0].plot(df.value.diff()); axes[0].set_title('1st Differencing')
+axes[1].set(ylim=(0,5))
+plot_pacf(df.value.diff().dropna(), ax=axes[1])
+
+plt.show()
