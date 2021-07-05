@@ -1,18 +1,5 @@
-import pandas as pd
+from TrendAnalysis.data_utils import DATA_PATH, read_csv, add_cumulative_mentions
 import matplotlib.pyplot as plt
-
-DATA_PATH = "C:\\Projects\\chaz\\SIGWATCH\\Data\\SIGWATCH_issue_data_export_REDACTED.csv"
-
-
-def read_csv(csv_path):
-    return pd.read_csv(DATA_PATH, parse_dates=['date'])
-
-
-def add_cumulative_mentions(data):
-    data = data.sort_values('date')
-    data['cumulative_mentions'] = data.groupby('issue_code').cumcount()
-    data = data.drop_duplicates(subset=['date', 'issue_code'], keep='last')
-    return data
 
 
 def plot_all_issues(data):
