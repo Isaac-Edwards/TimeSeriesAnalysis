@@ -3,21 +3,38 @@ import matplotlib.pyplot as plt
 
 DATA_PATH = "C:\\Projects\\chaz\\SIGWATCH\\Data\\SIGWATCH_issue_data_export_REDACTED.csv"
 
-df = pd.read_csv(DATA_PATH, index_col='date', parse_dates=True)
 
-issue_codes = df.issue_code.unique()
+def read_csv(csv_path):
+    return pd.read_csv(DATA_PATH, parse_dates=['date'])
 
-ax = None
-for issue in issue_codes:
-    single_issue_df = df[df['issue_code'] == issue].copy()
-    single_issue_df = single_issue_df.value_counts(['date', 'issue_code'], sort=False).reset_index(name='mentions')
-    single_issue_df.set_index('date', inplace=True)
 
-    single_issue_df['cumulative_mentions'] = single_issue_df['mentions'].cumsum()
+def add_cumulative_mentions(data):
+    data = data.sort_values('date')
+    data['cumulative_mentions'] = data.groupby('issue_code').cumcount()
+    data = data.drop_duplicates(subset=['date', 'issue_code'], keep='last')
+    return data
 
-    if ax is None:
-        ax = single_issue_df['cumulative_mentions'].plot()
-    else:
-        single_issue_df['cumulative_mentions'].plot(ax=ax)
 
-plt.show()
+def plot_all_issues(data):
+    issue_codes = data['issue_code'].unique()
+
+    data.set_index('date', inplace=True)
+    ax = None
+    for issue in issue_codes:
+        single_issue_df = data[data['issue_code'] == issue]
+        if ax is None:
+            ax = single_issue_df['cumulative_mentions'].plot()
+        else:
+            single_issue_df['cumulative_mentions'].plot(ax=ax)
+
+    plt.show()
+
+
+def main():
+    df = read_csv(DATA_PATH)
+    df = add_cumulative_mentions(df)
+    plot_all_issues(df)
+
+
+if __name__ == "__main__":
+    main()
